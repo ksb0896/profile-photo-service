@@ -1,7 +1,7 @@
-package com.ksb.micro.user_profile.service.impl;
+package com.ksb.micro.profile_photo.service.impl;
 
-import com.ksb.micro.user_profile.model.ProfilePhoto;
-import com.ksb.micro.user_profile.repository.ProfilePhotoRepository;
+import com.ksb.micro.profile_photo.model.ProfilePhoto;
+import com.ksb.micro.profile_photo.repository.ProfilePhotoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
