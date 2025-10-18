@@ -1,6 +1,6 @@
-package com.ksb.micro.profile_photo.service.impl;
+package com.ksb.micro.user_profile.service.impl;
 
-import com.ksb.micro.profile_photo.model.ProfilePhoto;
+import com.ksb.micro.user_profile.model.ProfilePhoto;
 
 import java.util.Optional;
 

@@ -1,5 +1,5 @@
 //JPA Entity for the `profile_photos` table.
-package com.ksb.micro.profile_photo.model;
+package com.ksb.micro.user_profile.model;
 
 import jakarta.persistence.*;
 import lombok.Data;

@@ -1,7 +1,7 @@
-package com.ksb.micro.profile_photo.controller;
+package com.ksb.micro.user_profile.controller;
 
-import com.ksb.micro.profile_photo.model.ProfilePhoto;
-import com.ksb.micro.profile_photo.service.impl.ProfilePhotoService;
+import com.ksb.micro.user_profile.model.ProfilePhoto;
+import com.ksb.micro.user_profile.service.impl.ProfilePhotoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
