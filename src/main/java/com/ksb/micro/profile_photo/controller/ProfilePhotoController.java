@@ -42,7 +42,7 @@ public class ProfilePhotoController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Photo uploaded successfully.");
     }
 
-    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/photo")
     public ResponseEntity<String> updateProfilePhoto(@PathVariable Long userId, @RequestParam("file") MultipartFile file) throws IOException{
         ProfilePhoto updatePhoto = profilePhotoService.updateProfilePhoto(userId,file.getBytes(),file.getContentType());
         if(updatePhoto !=null){
@@ -51,7 +51,7 @@ public class ProfilePhotoController {
         return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping
+    @DeleteMapping(value = "/photo")
     public ResponseEntity<Void> deleteProfilePhoto(@PathVariable Long userId){
         Optional<ProfilePhoto> photo = profilePhotoService.getProfilePhotoByUserId(userId);
         if(photo.isEmpty()){
