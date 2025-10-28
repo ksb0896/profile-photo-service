@@ -11,9 +11,16 @@ public class ProfilePhoto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    //this column ensures that photo is tied to the bank
+    @Column(nullable = false)
+    private Long bankId;
+
+    @Column(unique = true, nullable = false)
     private Long userId;
 
     @Lob
+    @Column(columnDefinition = "LONGBLOB")
     private byte[] photoData;
     private String contentType;
 }

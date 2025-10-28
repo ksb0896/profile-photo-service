@@ -21,8 +21,8 @@ public class ProfilePhotoController {
     private ProfilePhotoService profilePhotoService;
 
     @GetMapping(value = "/photo")
-    public ResponseEntity<byte[]> getProfilePhotoByUserId(@PathVariable Long userId){
-        Optional<ProfilePhoto> photo = profilePhotoService.getProfilePhotoByUserId(userId);
+    public ResponseEntity<byte[]> getProfilePhotoByUserId(@PathVariable Long bankId, @PathVariable Long userId){
+        Optional<ProfilePhoto> photo = profilePhotoService.getProfilePhotoByUserId(bankId,userId);
         if(photo.isPresent()){
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.parseMediaType(photo.get().getContentType()));
@@ -33,18 +33,18 @@ public class ProfilePhotoController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/photo")
-    public ResponseEntity<String> uploadProfilePhoto(@PathVariable Long userId, @RequestParam("file") MultipartFile file) throws IOException{
-        Optional<ProfilePhoto> existingPhoto = profilePhotoService.getProfilePhotoByUserId(userId);
+    public ResponseEntity<String> uploadProfilePhoto(@PathVariable Long bankId,@PathVariable Long userId, @RequestParam("file") MultipartFile file) throws IOException{
+        Optional<ProfilePhoto> existingPhoto = profilePhotoService.getProfilePhotoByUserId(bankId,userId);
         if(existingPhoto.isPresent()){
             return new ResponseEntity<>("Photo already exists!! Try to update it", HttpStatus.CONFLICT);
         }
-        profilePhotoService.saveProfilePhoto(userId, file.getBytes(), file.getContentType());
+        profilePhotoService.saveProfilePhoto(bankId,userId, file.getBytes(), file.getContentType());
         return ResponseEntity.status(HttpStatus.CREATED).body("Photo uploaded successfully.");
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/photo")
-    public ResponseEntity<String> updateProfilePhoto(@PathVariable Long userId, @RequestParam("file") MultipartFile file) throws IOException{
-        ProfilePhoto updatePhoto = profilePhotoService.updateProfilePhoto(userId,file.getBytes(),file.getContentType());
+    public ResponseEntity<String> updateProfilePhoto(@PathVariable Long bankId,@PathVariable Long userId, @RequestParam("file") MultipartFile file) throws IOException{
+        ProfilePhoto updatePhoto = profilePhotoService.updateProfilePhoto(bankId,userId,file.getBytes(),file.getContentType());
         if(updatePhoto !=null){
             return ResponseEntity.ok("Photo updated successfully!!");
         }
@@ -52,12 +52,12 @@ public class ProfilePhotoController {
     }
 
     @DeleteMapping(value = "/photo")
-    public ResponseEntity<Void> deleteProfilePhoto(@PathVariable Long userId){
-        Optional<ProfilePhoto> photo = profilePhotoService.getProfilePhotoByUserId(userId);
+    public ResponseEntity<Void> deleteProfilePhoto(@PathVariable Long bankId,@PathVariable Long userId){
+        Optional<ProfilePhoto> photo = profilePhotoService.getProfilePhotoByUserId(bankId,userId);
         if(photo.isEmpty()){
             return ResponseEntity.notFound().build(); //for 404
         }
-        profilePhotoService.deleteProfilePhoto(userId);
+        profilePhotoService.deleteProfilePhoto(bankId,userId);
         return ResponseEntity.noContent().build(); //for 204 status code
     }
 }

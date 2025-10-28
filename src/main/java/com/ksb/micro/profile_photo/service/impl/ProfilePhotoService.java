@@ -5,8 +5,8 @@ import com.ksb.micro.profile_photo.model.ProfilePhoto;
 import java.util.Optional;
 
 public interface ProfilePhotoService {
-    Optional<ProfilePhoto> getProfilePhotoByUserId(Long userId);
-    ProfilePhoto saveProfilePhoto(Long userId, byte[] photoData, String contentType);
-    ProfilePhoto updateProfilePhoto(Long userId, byte[] photoData, String contentType);
-    void deleteProfilePhoto(Long userId);
+    Optional<ProfilePhoto> getProfilePhotoByUserId(Long bankId,Long userId);
+    ProfilePhoto saveProfilePhoto(Long bankId,Long userId, byte[] photoData, String contentType);
+    ProfilePhoto updateProfilePhoto(Long bankId,Long userId, byte[] photoData, String contentType);
+    void deleteProfilePhoto(Long bankId,Long userId);
 }
