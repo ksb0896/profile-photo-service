@@ -31,15 +31,7 @@ public class ProfilePhotoServiceImpl implements ProfilePhotoService{
 
     @Override
     public ProfilePhoto updateProfilePhoto(Long bankId,Long userId, byte[] photoData, String contentType) {
-//        Optional<ProfilePhoto> existingPhoto = profilePhotoRepository.findByUserId(bankId,userId);
-//        if (existingPhoto.isPresent()) {
-//            ProfilePhoto photoToUpdate = existingPhoto.get();
-//            photoToUpdate.setPhotoData(photoData);
-//            photoToUpdate.setContentType(contentType);
-//            return profilePhotoRepository.save(photoToUpdate); //update and save
-//        }
-//        return null; //if not present, return 'null' response
-        // Find the existing photo using both IDs to ensure it's the correct one
+
         ProfilePhoto photo = profilePhotoRepository.findByBankIdAndUserId(bankId, userId)
                 .orElse(new ProfilePhoto()); // If not found, create a new one (idempotent PUT)
 
