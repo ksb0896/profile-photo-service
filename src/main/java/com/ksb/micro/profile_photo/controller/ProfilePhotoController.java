@@ -2,6 +2,10 @@ package com.ksb.micro.profile_photo.controller;
 
 import com.ksb.micro.profile_photo.model.ProfilePhoto;
 import com.ksb.micro.profile_photo.service.impl.ProfilePhotoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,12 +19,18 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/v1/banks/{bankId}/users/{userId}")
+@Tag(name = "Photo", description = "Profile photo endpoints")
 public class ProfilePhotoController {
 
     @Autowired
     private ProfilePhotoService profilePhotoService;
 
     @GetMapping(value = "/photo")
+    @Operation(summary = "Get profile photo by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Profile photo found"),
+            @ApiResponse(responseCode = "404", description = "Profile photo not found")
+    })
     public ResponseEntity<byte[]> getProfilePhotoByUserId(@PathVariable Long bankId, @PathVariable Long userId){
         Optional<ProfilePhoto> photo = profilePhotoService.getProfilePhotoByUserId(bankId,userId);
         if(photo.isPresent()){
@@ -33,6 +43,8 @@ public class ProfilePhotoController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/photo")
+    @Operation(summary = "Profile photo uploaded")
+    @ApiResponse(responseCode = "201", description = "Profile photo uploaded successfully")
     public ResponseEntity<String> uploadProfilePhoto(@PathVariable Long bankId,@PathVariable Long userId, @RequestParam("file") MultipartFile file) throws IOException{
         Optional<ProfilePhoto> existingPhoto = profilePhotoService.getProfilePhotoByUserId(bankId,userId);
         if(existingPhoto.isPresent()){
@@ -43,6 +55,7 @@ public class ProfilePhotoController {
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/photo")
+    @Operation(summary = "Profile photo updated for that ID")
     public ResponseEntity<String> updateProfilePhoto(@PathVariable Long bankId,@PathVariable Long userId, @RequestParam("file") MultipartFile file) throws IOException{
         ProfilePhoto updatePhoto = profilePhotoService.updateProfilePhoto(bankId,userId,file.getBytes(),file.getContentType());
         if(updatePhoto !=null){
@@ -52,6 +65,7 @@ public class ProfilePhotoController {
     }
 
     @DeleteMapping(value = "/photo")
+    @Operation(summary = "Profile photo deleted for that ID")
     public ResponseEntity<Void> deleteProfilePhoto(@PathVariable Long bankId,@PathVariable Long userId){
         Optional<ProfilePhoto> photo = profilePhotoService.getProfilePhotoByUserId(bankId,userId);
         if(photo.isEmpty()){
