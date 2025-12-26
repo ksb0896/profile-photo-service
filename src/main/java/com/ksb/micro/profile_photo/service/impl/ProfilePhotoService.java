@@ -2,6 +2,7 @@ package com.ksb.micro.profile_photo.service.impl;
 
 import com.ksb.micro.profile_photo.model.ProfilePhoto;
 
+import java.io.IOException;
 import java.util.Optional;
 
 public interface ProfilePhotoService {

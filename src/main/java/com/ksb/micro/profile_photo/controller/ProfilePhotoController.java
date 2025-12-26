@@ -46,6 +46,18 @@ public class ProfilePhotoController {
     @Operation(summary = "Profile photo uploaded")
     @ApiResponse(responseCode = "201", description = "Profile photo uploaded successfully")
     public ResponseEntity<String> uploadProfilePhoto(@PathVariable Long bankId,@PathVariable Long userId, @RequestParam("file") MultipartFile file) throws IOException{
+
+        //file empty check
+        if(file.isEmpty()){
+            return new ResponseEntity<>("File is empty!", HttpStatus.BAD_REQUEST);
+        }
+
+        //Max size
+        long maxFileSize = 2 * 1024 * 1024; // 2MB
+        if (file.getSize() > maxFileSize) {
+            return new ResponseEntity<>("File size exceeds 2MB limit!", HttpStatus.BAD_REQUEST);
+        }
+
         // Check if the content type is image/png
         if (!"image/png".equalsIgnoreCase(file.getContentType())) {
             return new ResponseEntity<>("Only .png files are allowed!", HttpStatus.BAD_REQUEST);
@@ -61,14 +73,30 @@ public class ProfilePhotoController {
         if(existingPhoto.isPresent()){
             return new ResponseEntity<>("Photo already exists!! Try to update it", HttpStatus.CONFLICT);
         }
-        profilePhotoService.saveProfilePhoto(bankId,userId, file.getBytes(), file.getContentType());
-        return ResponseEntity.status(HttpStatus.CREATED).body("Photo uploaded successfully.");
+        try{
+            profilePhotoService.saveProfilePhoto(bankId,userId, file.getBytes(), file.getContentType());
+            return ResponseEntity.status(HttpStatus.CREATED).body("Photo uploaded successfully.");
+        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/photo")
     @Operation(summary = "Profile photo updated for that ID")
     public ResponseEntity<String> updateProfilePhoto(@PathVariable Long bankId,@PathVariable Long userId, @RequestParam("file") MultipartFile file) throws IOException{
         ProfilePhoto updatePhoto = profilePhotoService.updateProfilePhoto(bankId,userId,file.getBytes(),file.getContentType());
+
+        //file empty check
+        if(file.isEmpty()){
+            return new ResponseEntity<>("File is empty!", HttpStatus.BAD_REQUEST);
+        }
+
+        //Max size
+        long maxFileSize = 2 * 1024 * 1024; // 2MB
+        if (file.getSize() > maxFileSize) {
+            return new ResponseEntity<>("File size exceeds 2MB limit!", HttpStatus.BAD_REQUEST);
+        }
+
         // Check if the content type is image/png
         if (!"image/png".equalsIgnoreCase(file.getContentType())) {
             return new ResponseEntity<>("Only .png files are allowed!", HttpStatus.BAD_REQUEST);
@@ -79,8 +107,13 @@ public class ProfilePhotoController {
         if (fileName == null || !fileName.toLowerCase().endsWith(".png")) {
             return new ResponseEntity<>("Invalid file extension. Only .png is allowed!", HttpStatus.BAD_REQUEST);
         }
-        if(updatePhoto !=null){
-            return ResponseEntity.ok("Photo updated successfully!!");
+
+        try{
+            if(updatePhoto !=null){
+                return ResponseEntity.ok("Photo updated successfully!!");
+            }
+        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.notFound().build();
     }

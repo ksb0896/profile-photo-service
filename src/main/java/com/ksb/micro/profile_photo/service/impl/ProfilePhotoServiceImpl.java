@@ -30,6 +30,9 @@ public class ProfilePhotoServiceImpl implements ProfilePhotoService {
         if ("!image/png".equalsIgnoreCase(contentType)) {
             throw new IllegalArgumentException("Unsupported file type: " + contentType);
         }
+
+        // Additional photo validations
+        validateImage(photoData);
         byte[] optimizedData = compressImage(photoData);
 
         ProfilePhoto photo = new ProfilePhoto();
@@ -48,6 +51,8 @@ public class ProfilePhotoServiceImpl implements ProfilePhotoService {
         ProfilePhoto photo = profilePhotoRepository.findByBankIdAndUserId(bankId, userId)
                 .orElseThrow(() -> new RuntimeException("Profile photo not found. Please upload a photo first."));
 
+        // Additional photo validations
+        validateImage(photoData);
         byte[] optimizedData = compressImage(photoData);
 
         photo.setBankId(bankId); // Set/update bankId
@@ -63,6 +68,7 @@ public class ProfilePhotoServiceImpl implements ProfilePhotoService {
         profilePhotoRepository.deleteByBankIdAndUserId(bankId, userId);
     }
 
+    // Additional photo validations
     private byte[] compressImage(byte[] data) {
         try {
             ByteArrayInputStream bais = new ByteArrayInputStream(data);
@@ -83,6 +89,20 @@ public class ProfilePhotoServiceImpl implements ProfilePhotoService {
             return baos.toByteArray();
         } catch (IOException e) {
             return data;
+        }
+    }
+
+    private void validateImage(byte[] data) {
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(data)) {
+            BufferedImage image = ImageIO.read(bais);
+            if (image == null) {
+                throw new IllegalArgumentException("Invalid image content. File is not a valid PNG.");
+            }
+            if (image.getWidth() < 10 || image.getHeight() < 10) {
+                throw new IllegalArgumentException("Image dimensions are too small.");
+            }
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Error validating image content.");
         }
     }
 }
