@@ -30,7 +30,7 @@ This microservice is part of a larger user service ecosystem and provides RESTfu
 - **Default Database**: `user_profile_db`
 - **Default User**: root
 - **Default Password**: mysql
-- **Hibernate DDL Auto**: update
+- **Hibernate DDL Auto**: none
 
 ## File Upload Configuration
 
