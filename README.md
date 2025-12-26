@@ -159,9 +159,7 @@ The service will start on `http://localhost:8082`
 ## Future Enhancements
 
 - Eureka Service Discovery integration (commented out, ready to uncomment)
-- Image compression and optimization
 - Caching mechanisms
-- Additional image validation
 
 ## Notes
 
