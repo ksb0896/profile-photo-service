@@ -46,6 +46,17 @@ public class ProfilePhotoController {
     @Operation(summary = "Profile photo uploaded")
     @ApiResponse(responseCode = "201", description = "Profile photo uploaded successfully")
     public ResponseEntity<String> uploadProfilePhoto(@PathVariable Long bankId,@PathVariable Long userId, @RequestParam("file") MultipartFile file) throws IOException{
+        // Check if the content type is image/png
+        if (!"image/png".equalsIgnoreCase(file.getContentType())) {
+            return new ResponseEntity<>("Only .png files are allowed!", HttpStatus.BAD_REQUEST);
+        }
+
+        // Verify the extension
+        String fileName = file.getOriginalFilename();
+        if (fileName == null || !fileName.toLowerCase().endsWith(".png")) {
+            return new ResponseEntity<>("Invalid file extension. Only .png is allowed!", HttpStatus.BAD_REQUEST);
+        }
+
         Optional<ProfilePhoto> existingPhoto = profilePhotoService.getProfilePhotoByUserId(bankId,userId);
         if(existingPhoto.isPresent()){
             return new ResponseEntity<>("Photo already exists!! Try to update it", HttpStatus.CONFLICT);
@@ -58,6 +69,16 @@ public class ProfilePhotoController {
     @Operation(summary = "Profile photo updated for that ID")
     public ResponseEntity<String> updateProfilePhoto(@PathVariable Long bankId,@PathVariable Long userId, @RequestParam("file") MultipartFile file) throws IOException{
         ProfilePhoto updatePhoto = profilePhotoService.updateProfilePhoto(bankId,userId,file.getBytes(),file.getContentType());
+        // Check if the content type is image/png
+        if (!"image/png".equalsIgnoreCase(file.getContentType())) {
+            return new ResponseEntity<>("Only .png files are allowed!", HttpStatus.BAD_REQUEST);
+        }
+
+        // Verify the extension
+        String fileName = file.getOriginalFilename();
+        if (fileName == null || !fileName.toLowerCase().endsWith(".png")) {
+            return new ResponseEntity<>("Invalid file extension. Only .png is allowed!", HttpStatus.BAD_REQUEST);
+        }
         if(updatePhoto !=null){
             return ResponseEntity.ok("Photo updated successfully!!");
         }

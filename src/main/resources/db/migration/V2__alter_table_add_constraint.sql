@@ -1,0 +1,1 @@
+ALTER TABLE profile_photos ADD CONSTRAINT uniqueUserId UNIQUE (user_id);

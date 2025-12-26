@@ -6,7 +6,11 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "profile_photos")
+@Table(name = "profile_photos",
+uniqueConstraints = {
+        @UniqueConstraint(name = "uniqueUserId", columnNames = {"user_id"})
+}
+)
 public class ProfilePhoto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

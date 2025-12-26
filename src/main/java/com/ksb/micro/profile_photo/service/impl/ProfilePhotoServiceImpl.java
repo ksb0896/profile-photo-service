@@ -21,6 +21,9 @@ public class ProfilePhotoServiceImpl implements ProfilePhotoService{
 
     @Override
     public ProfilePhoto saveProfilePhoto(Long bankId,Long userId, byte[] photoData, String contentType) {
+        if("!image/png".equalsIgnoreCase(contentType)){
+            throw new IllegalArgumentException("Unsupported file type: " + contentType);
+        }
         ProfilePhoto photo = new ProfilePhoto();
         photo.setBankId(bankId);
         photo.setUserId(userId);
@@ -31,9 +34,11 @@ public class ProfilePhotoServiceImpl implements ProfilePhotoService{
 
     @Override
     public ProfilePhoto updateProfilePhoto(Long bankId,Long userId, byte[] photoData, String contentType) {
-
+        if("!image/png".equalsIgnoreCase(contentType)){
+            throw new IllegalArgumentException("Unsupported file type: " + contentType);
+        }
         ProfilePhoto photo = profilePhotoRepository.findByBankIdAndUserId(bankId, userId)
-                .orElse(new ProfilePhoto()); // If not found, create a new one (idempotent PUT)
+                .orElseThrow(() -> new RuntimeException("Profile photo not found. Please upload a photo first."));
 
         photo.setBankId(bankId); // Set/update bankId
         photo.setUserId(userId); // Set/update userId
