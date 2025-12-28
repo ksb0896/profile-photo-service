@@ -4,7 +4,6 @@ import com.ksb.micro.profile_photo.model.ProfilePhoto;
 import com.ksb.micro.profile_photo.repository.ProfilePhotoRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
