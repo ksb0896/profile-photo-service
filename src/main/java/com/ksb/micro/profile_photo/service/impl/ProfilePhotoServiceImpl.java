@@ -3,6 +3,7 @@ package com.ksb.micro.profile_photo.service.impl;
 import com.ksb.micro.profile_photo.model.ProfilePhoto;
 import com.ksb.micro.profile_photo.repository.ProfilePhotoRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,51 +16,28 @@ import java.io.IOException;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ProfilePhotoServiceImpl implements ProfilePhotoService {
 
-    @Autowired
-    private ProfilePhotoRepository profilePhotoRepository;
+    private final ProfilePhotoRepository profilePhotoRepository;
 
     @Override
+    @Transactional
     public Optional<ProfilePhoto> getProfilePhotoByUserId(Long bankId, Long userId) {
         return profilePhotoRepository.findByBankIdAndUserId(bankId, userId);
     }
 
     @Override
+    @Transactional
     public ProfilePhoto saveProfilePhoto(Long bankId, Long userId, byte[] photoData, String contentType) {
-        if ("!image/png".equalsIgnoreCase(contentType)) {
-            throw new IllegalArgumentException("Unsupported file type: " + contentType);
-        }
-
-        // Additional photo validations
-        validateImage(photoData);
-        byte[] optimizedData = compressImage(photoData);
-
-        ProfilePhoto photo = new ProfilePhoto();
-        photo.setBankId(bankId);
-        photo.setUserId(userId);
-        photo.setPhotoData(optimizedData);
-        photo.setContentType(contentType);
-        return profilePhotoRepository.save(photo); //saving the photo
+            return processAndSave(new ProfilePhoto(), bankId, userId, photoData, contentType);
     }
 
     @Override
     public ProfilePhoto updateProfilePhoto(Long bankId, Long userId, byte[] photoData, String contentType) {
-        if ("!image/png".equalsIgnoreCase(contentType)) {
-            throw new IllegalArgumentException("Unsupported file type: " + contentType);
-        }
         ProfilePhoto photo = profilePhotoRepository.findByBankIdAndUserId(bankId, userId)
                 .orElseThrow(() -> new RuntimeException("Profile photo not found. Please upload a photo first."));
-
-        // Additional photo validations
-        validateImage(photoData);
-        byte[] optimizedData = compressImage(photoData);
-
-        photo.setBankId(bankId); // Set/update bankId
-        photo.setUserId(userId); // Set/update userId
-        photo.setPhotoData(optimizedData);
-        photo.setContentType(contentType);
-        return profilePhotoRepository.save(photo);
+        return processAndSave(photo, bankId, userId, photoData, contentType);
     }
 
     @Override
@@ -70,21 +48,20 @@ public class ProfilePhotoServiceImpl implements ProfilePhotoService {
 
     // Additional photo validations
     private byte[] compressImage(byte[] data) {
-        try {
-            ByteArrayInputStream bais = new ByteArrayInputStream(data);
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(data);
+             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             BufferedImage originalImage = ImageIO.read(bais);
+            if (originalImage == null) return data;
 
             int targetWidth = 800;
             int targetHeight = (int) (originalImage.getHeight() * (targetWidth / (double) originalImage.getWidth()));
 
-            Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_FAST);
             BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
-
             Graphics2D g2d = outputImage.createGraphics();
-            g2d.drawImage(resultingImage, 0, 0, null);
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2d.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
             g2d.dispose();
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(outputImage, "png", baos);
             return baos.toByteArray();
         } catch (IOException e) {
@@ -105,4 +82,19 @@ public class ProfilePhotoServiceImpl implements ProfilePhotoService {
             throw new IllegalArgumentException("Error validating image content.");
         }
     }
+    private ProfilePhoto processAndSave(ProfilePhoto photo, Long bankId, Long userId, byte[] photoData, String contentType) {
+        if (!"image/png".equalsIgnoreCase(contentType)) {
+            throw new IllegalArgumentException("Unsupported file type: " + contentType);
+        }
+
+        validateImage(photoData);
+        byte[] optimizedData = compressImage(photoData);
+
+        photo.setBankId(bankId);
+        photo.setUserId(userId);
+        photo.setPhotoData(optimizedData);
+        photo.setContentType(contentType);
+        return profilePhotoRepository.save(photo);
+    }
+
 }
