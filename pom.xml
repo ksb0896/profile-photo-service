@@ -84,7 +84,7 @@
 	</dependencyManagement>
 
 	<build>
-		<finalName>user-profile-service</finalName>
+		<finalName>profile-photo-service</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
