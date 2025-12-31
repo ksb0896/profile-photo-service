@@ -81,6 +81,8 @@ public class ProfilePhotoServiceImpl implements ProfilePhotoService {
             throw new IllegalArgumentException("Error validating image content.");
         }
     }
+
+    //common function to-save-photo
     private ProfilePhoto processAndSave(ProfilePhoto photo, Long bankId, Long userId, byte[] photoData, String contentType) {
         if (!"image/png".equalsIgnoreCase(contentType)) {
             throw new IllegalArgumentException("Unsupported file type: " + contentType);
